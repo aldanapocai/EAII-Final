@@ -40,7 +40,7 @@ int main(void) {
         PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
         delay_ms_custom((2300 - pausa)/1000);
       }
-      delay_ms_custom(30000); //wait 30 seconds
+      delay_ms_custom(15000); //wait 15 seconds
     } else {
       // PD2 is low, set PB5 low
       PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB5);
