@@ -17,22 +17,30 @@
 void delay_us_custom(long us) {
   uint16_t i, j;
   for (i = 0; i < us; i++) {
-    for (j = 0; j < 4; j++) { //Ajustado 16000/4
+    for (j = 0; j < 4; j++) { //Ajustado 16000/4/1000
+      asm volatile("nop"); // Delay for 1us
+    }
+  }
+}
+void delay_ms_custom(long ms) {
+  uint16_t i, j;
+  for (i = 0; i < ms; i++) {
+    for (j = 0; j < 2000; j++) { //Ajustado 16000/8
       asm volatile("nop"); // Delay for 1ms
     }
   }
 }
 
 void setServoAngle(uint8_t angle) {
-    // Calculate pulse width based on the desired angle (adjust these values)
-    uint16_t pulseWidth = 600 + (angle * 10);
-    for (int Hz = 0; Hz < 50; Hz++) {
-      // Send the PWM signal
-      PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB1); // PB1 HIGH
-      delay_us_custom(pulseWidth); // Convert pulse width to seconds
-      PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
-      delay_us_custom(20000 - pulseWidth); // Remaining time in the period
-    }
+  // Calculate pulse width based on the desired angle (adjust these values)
+  uint16_t pulseWidth = 600 + (angle * 10);
+  for (int Hz = 0; Hz < 50; Hz++) {
+    // Send the PWM signal
+    PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB1); // PB1 HIGH
+    delay_us_custom(pulseWidth); // Convert pulse width to seconds
+    PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
+    delay_us_custom(20000 - pulseWidth); // Remaining time in the period
+  }
 }
 
 int main(void) {
@@ -44,21 +52,18 @@ int main(void) {
   while (1) {
     if (PIND_ADDRESS & (1 << PIND2)) {
       // PD2 is high, set PB5 low
-        PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB5);
-    // Rotate to 180°
-        setServoAngle(180);
-        delay_us_custom(20000);
+      PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB5);
+      
+      // Rotate to 180°
+      setServoAngle(180);
+      delay_ms_custom(15000); //wait 15s
 
-        // Rotate to 90°
-        setServoAngle(90);
-        delay_us_custom(20000);
-
-        // Rotate to 0°
-        setServoAngle(0);
-        delay_us_custom(20000);      
-  }  else {
+      // Rotate to 0°
+      setServoAngle(0);
+      delay_us_custom(20000);      
+    } else {
       // PD2 is low, set PB5 high
-       PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB5);
+      PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB5);
     }
   }
 }
