@@ -2,7 +2,7 @@
 
 #define PORTD_ADDRESS *((volatile uint8_t*) 0x2B) //Port D Data Register
 #define DDRD_ADDRESS *((volatile uint8_t*) 0x2A) //Port D Data Direction Register
-#define PIND_ADDRESS *((volatile uint8_t*) 0x29) //Port D Input Pins AddresS
+#define PIND_ADDRESS *((volatile uint8_t*) 0x29) //Port D Input Pins Address
 #define PORTD2 2 //Arduino D2
 #define DDD2 2
 #define PIND2 2
@@ -14,12 +14,25 @@
 #define PORTB1 1 //Arduino D9
 #define DDB1 1
 
-
-void delay_ms_custom(uint16_t ms) {
+void delay_us_custom(long us) {
   uint16_t i, j;
-  for (i = 0; i < ms; i++)
-    for (j = 0; j < 3200; j++) //Ajustado 16000/4
+  for (i = 0; i < us; i++) {
+    for (j = 0; j < 4; j++) { //Ajustado 16000/4
       asm volatile("nop"); // Delay for 1ms
+    }
+  }
+}
+
+void setServoAngle(uint8_t angle) {
+    // Calculate pulse width based on the desired angle (adjust these values)
+    uint16_t pulseWidth = 600 + (angle * 10);
+    for (int Hz = 0; Hz < 50; Hz++) {
+      // Send the PWM signal
+      PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB1); // PB1 HIGH
+      delay_us_custom(pulseWidth); // Convert pulse width to seconds
+      PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
+      delay_us_custom(20000 - pulseWidth); // Remaining time in the period
+    }
 }
 
 int main(void) {
@@ -29,26 +42,23 @@ int main(void) {
   DDRB_ADDRESS = DDRB_ADDRESS | (1 << DDB1);   // PB1 as output
 
   while (1) {
-    // Read the state of PD2
     if (PIND_ADDRESS & (1 << PIND2)) {
-      PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB5); //LED HIGH
-      //set PD7 motor to 180° using pulse width modulation
-      for (int Hz = 0; Hz < 50; Hz++) {
-        uint16_t pausa = (180*2000.0/200.0) + 500;
-        PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB1); //PB1 HIGH
-        delay_ms_custom(pausa/1000); //Delay 2300 microseconds
-        PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
-        delay_ms_custom((2300 - pausa)/1000);
-      }
-      delay_ms_custom(15000); //wait 15 seconds
-    } else {
-      // PD2 is low, set PB5 low
-      PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB5);
+      // PD2 is high, set PB5 low
+        PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB5);
+    // Rotate to 180°
+        setServoAngle(180);
+        delay_us_custom(20000);
+
+        // Rotate to 90°
+        setServoAngle(90);
+        delay_us_custom(20000);
+
+        // Rotate to 0°
+        setServoAngle(0);
+        delay_us_custom(20000);      
+  }  else {
+      // PD2 is low, set PB5 high
+       PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB5);
     }
-
-    // Custom delay of 500 milliseconds
-    delay_ms_custom(500);
   }
-
-  return 0;
 }
