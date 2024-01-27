@@ -17,7 +17,7 @@
 void delay_us_custom(long us) {
   uint16_t i, j;
   for (i = 0; i < us; i++) {
-    for (j = 0; j < 4; j++) { //Ajustado 16000/4/1000
+    for (j = 0; j < 4; j++) { //Ajustado 8000/4/1000
       asm volatile("nop"); // Delay for 1us
     }
   }
@@ -25,7 +25,7 @@ void delay_us_custom(long us) {
 void delay_ms_custom(long ms) {
   uint16_t i, j;
   for (i = 0; i < ms; i++) {
-    for (j = 0; j < 2000; j++) { //Ajustado 16000/8
+    for (j = 0; j < 2000; j++) { //Ajustado 16000/8-> 2MHz
       asm volatile("nop"); // Delay for 1ms
     }
   }
@@ -56,7 +56,7 @@ int main(void) {
       
       // Rotate to 180°
       setServoAngle(180);
-      delay_ms_custom(15000); //wait 15s
+      delay_ms_custom(5000); //wait 5s
 
       // Rotate to 0°
       setServoAngle(0);
