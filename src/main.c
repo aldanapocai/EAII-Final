@@ -56,11 +56,11 @@ int main(void) {
       
       // Rotate to 180°
       setServoAngle(180);
-      delay_ms_custom(5000); //wait 5s
+      delay_ms_custom(10000); //wait 10s
 
       // Rotate to 0°
       setServoAngle(0);
-      delay_us_custom(20000);      
+      delay_us_custom(5000);      
     } else {
       // PD2 is low, set PB5 high
       PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB5);
