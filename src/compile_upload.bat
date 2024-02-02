@@ -9,4 +9,3 @@ rm Main.o
 rm Executable.elf
 
 avrdude -p atmega328p -c arduino -b 115200 -P COM6 -U flash:w:Executable.ihex:i
-

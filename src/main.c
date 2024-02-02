@@ -32,14 +32,14 @@ void delay_ms_custom(long ms) {
 }
 
 void setServoAngle(uint8_t angle) {
-  // Calculate pulse width based on the desired angle (adjust these values)
+  // Pulso calculado en base a los angulos deseados
   uint16_t pulseWidth = 600 + (angle * 10);
   for (int Hz = 0; Hz < 50; Hz++) {
-    // Send the PWM signal
+    //Envia la señal PWM
     PORTB_ADDRESS = PORTB_ADDRESS | (1 << PORTB1); // PB1 HIGH
-    delay_us_custom(pulseWidth); // Convert pulse width to seconds
+    delay_us_custom(pulseWidth); // Convierte el ancho del pulso a segundos
     PORTB_ADDRESS = PORTB_ADDRESS & ~(1 << PORTB1); //PB1 LOW
-    delay_us_custom(20000 - pulseWidth); // Remaining time in the period
+    delay_us_custom(20000 - pulseWidth); // Tiempo remanente en el periodo
   }
 }
 
